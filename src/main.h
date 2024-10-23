@@ -5,8 +5,6 @@
 #include <chrono>
 #include "Music.h"
 
-
-
 const float rotation = 0.0f;
 
 // TODO: Make gravity value reverse
