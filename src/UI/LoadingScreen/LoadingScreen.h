@@ -13,9 +13,9 @@ private:
     Rectangle settingsButton;       // Rectangle for the Settings button
 
 public:
-    bool loadingComplete = !LOADING_SCREEN_ENABLED;
-    bool onMainMenu ;          
-    bool clickedStartGame ;          
+    bool loadingComplete = false;
+    bool onMainMenu;          
+    bool clickedStartGame;          
 
     LoadingScreen();
     ~LoadingScreen();

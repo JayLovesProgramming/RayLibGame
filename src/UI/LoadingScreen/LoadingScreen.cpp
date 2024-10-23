@@ -1,7 +1,5 @@
 #include "LoadingScreen.h"
 
-LoadingScreen loadingScreen;
-
 LoadingScreen::LoadingScreen()
     : loadingProgress(0.0f), loadingSpeed(0.01f), loadingComplete(false)
 {

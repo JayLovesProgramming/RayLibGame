@@ -1,5 +1,5 @@
 #include "main.h"
-#include "WalkAndRunAnimations.h"
+#include "Animations/WalkAndRunAnimations.cpp"
 #include "Screen.h"
 #include "Debug.h"
 #include "Audio/Music/Music.cpp"
@@ -31,7 +31,7 @@ void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
     destRec.y = player.position.y;
     DrawTexturePro(player.sprite, sourceRec, destRec, origin, (float)spriteRotation, WHITE);
     DrawCircleV(player.position, 8.0f, BLACK);
-    WalkAnimation();
+    walkAnimation.DoWalkAnimation();
 }
 
 // Checks if you are on top of a platform a.k.a a rectangle or platform
@@ -76,12 +76,12 @@ void HandleMovement(Player &player, float deltaTime)
 
     if (justStoppedMoving)
     {
-        isRunning = false;
+        walkAnimation.isRunning = false;
     }
     else if (movingLeft)
     {
         player.position.x -= PLAYER_HOR_SPD * deltaTime;
-        isRunning = true;
+        walkAnimation.isRunning = true;
         if (player.sprite.width > 0) // Only negate if it's positive (facing right)
         {
             player.sprite.width = -player.sprite.width; // Flip sprite to face left
@@ -90,7 +90,7 @@ void HandleMovement(Player &player, float deltaTime)
     else if (movingRight)
     {
         player.position.x += PLAYER_HOR_SPD * deltaTime;
-        isRunning = true;
+        walkAnimation.isRunning = true;
         if (player.sprite.width <= 0) // Only negate if it's positive (facing right)
         {
             player.sprite.width = -player.sprite.width; // Flip sprite to face left

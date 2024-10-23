@@ -1,20 +1,8 @@
-#include "raylib.h"
-#include "raymath.h"
-#include <cstdlib>
-#include <ctime>
-#include "Debug.h"
+#include "WalkAndRunAnimations.h"
 
-float frameWidth;
-float frameHeight;
-Rectangle sourceRec;
-bool isRunning = false;
-int currentFrame = 0;
-float walkSpeed = 0.2f;
-static float elapsedTime = 0.0f;
-const int maxFrames = 6;
-float usedToBeDeltaTime = 0.1f;
+WalkAnimation walkAnimation;
 
-void debugWalkAnimation()
+void WalkAnimation::DebugWalkAnimation()
 {
     if (isRunning)
     {
@@ -26,9 +14,9 @@ void debugWalkAnimation()
     }
 }
 
-void WalkAnimation()
+void WalkAnimation::DoWalkAnimation()
 {
-    // debugWalkAnimation();
+    // DebugWalkAnimation();
     if (!isRunning)
         currentFrame = 5; // Set to last frame if not running
     else if (isRunning)
