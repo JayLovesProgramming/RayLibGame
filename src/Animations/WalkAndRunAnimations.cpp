@@ -35,6 +35,6 @@ void WalkAnimation::DoWalkAnimation()
             elapsedTime = 0.0f; // Reset elapsed time
         }
         sourceRec.x = (float)(currentFrame * frameWidth);
-        // std::cout << (currentFrame) std::endl;
+        // std::cout << (currentFrame) << std::endl;
     } 
 }
