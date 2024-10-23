@@ -44,9 +44,9 @@ void UnloadGame(Texture2D sprite)
 struct Player
 {
     Vector2 position;
-    Texture2D sprite; 
     float speed;
     bool canJump;
+    Texture2D sprite; 
     // Destructor
     ~Player()
     {
@@ -58,8 +58,8 @@ struct Player
 struct EnvItem
 {
     Rectangle rect;
-    Color color;
     int blocking;
+    Color color;
 };
 // typedef struct EnvItem EnvItem; // For C compatability
 
