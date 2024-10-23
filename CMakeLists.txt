@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.0...3.21) # The version of CMake
 
 project(RayLibGame CXX) # Project name and the language (C++)
 
+
+message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
 # Sets up include paths for VS Code to prevent red squiggly lines
 set(JSON_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/.vscode/c_cpp_properties.json")
 set(JSON_CONTENT "
@@ -32,3 +36,8 @@ if (WIN32)
     target_link_libraries(${PROJECT_NAME} opengl32 gdi32 winmm)
 endif()
 
+
+
+# message(FATAL_ERROR "Current Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Get the root source directory
