@@ -3,10 +3,12 @@
 #include "Screen.h"
 #include "Debug.h"
 #include "Levels.h"
+#include "Music.h"
 
 // Main update loop
 void updateLoop()
 {
+    // UpdateMusicStream(music);   // Update music buffer with new stream data
     updateScreen();
 }
 
@@ -144,6 +146,11 @@ int main(void)
 
     // Initialization
     InitWindow(screenWidth, screenHeight, "JAY");
+
+    // StartMusic();
+    InitAudioDevice();
+    PlayMusicStream(music);
+    ResumeMusicStream(music);
     // loadGameWindowIcon();
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
