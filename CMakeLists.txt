@@ -29,7 +29,7 @@ set(RAYLIB_INCLUDE_DIR "dependencies/raylib/include")
 set(RAYLIB_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/lib")
 
 include_directories((${RAYLIB_INCLUDE_DIR})) # Include directories
-add_executable(${PROJECT_NAME}  src/main.cpp)
+add_executable(${PROJECT_NAME}  src/main.cpp )
 target_link_libraries(${PROJECT_NAME} ${RAYLIB_LIB_DIR}/raylib.lib)
 
 if (WIN32)

@@ -2,8 +2,8 @@
 #include "WalkAndRunAnimations.h"
 #include "Screen.h"
 #include "Debug.h"
-#include "Music.h"
-#include "LoadingScreen.h"
+#include "Audio/Music/Music.cpp"
+#include "UI/LoadingScreen/LoadingScreen.cpp"
 
 // Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again
 void CheckForPlayerJump(Player &player)
@@ -16,6 +16,11 @@ void CheckForPlayerJump(Player &player)
     }
 }
 
+const float getRandomFloatValue(int min, int max)
+{
+    return (float)(rand() % (min - max + 1) + min) * PLAYER_JUMP_MULTIPLAYER_JAY;
+};
+
 void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
 {
     for (int i = 0; i < envItemsLength; i++)
@@ -24,7 +29,7 @@ void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
     }
     destRec.x = player.position.x;
     destRec.y = player.position.y;
-    DrawTexturePro(player.sprite, sourceRec, destRec, origin, (float)rotation, WHITE);
+    DrawTexturePro(player.sprite, sourceRec, destRec, origin, (float)spriteRotation, WHITE);
     DrawCircleV(player.position, 8.0f, BLACK);
     WalkAnimation();
 }
@@ -139,7 +144,6 @@ void UpdatePlayer(Player &player, float deltaTime)
 // Main update loop
 void UpdateGameLoop(Player &player, float deltaTime)
 {
-    musicPlayer.UpdateMusic();
     UpdatePlayer(player, deltaTime);
 }
 
@@ -161,12 +165,14 @@ int main(void)
     // double time = GetTime();
 
     MusicPlayer musicPlayer = {};
-    LoadingScreen loadingScreen = {};
+    LoadingScreen loadingScreen;
+    loadingScreen.InitLoadingScreen("assets/images/background.png", "assets/fonts/FiraMonoNerdFont-Regular.otf");
+
     Player player = {0};
     Camera2D camera = {0};
     Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
     
-    musicPlayer.StartMusic("assets/music/country.mp3");
+    musicPlayer.StartMainGameMusic("assets/music/country.mp3", loadingScreen.loadingComplete);
 
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
@@ -218,10 +224,10 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
 
-        // Draw loading text
         loadingScreen.DrawLoadingBar(screenWidth, screenHeight);
+        loadingScreen.HandleInput();
 
-        if (loadingComplete)
+        if (!loadingScreen.onMainMenu && loadingScreen.clickedStartGame)
         {
             BeginMode2D(camera);
             DrawEssentials(destRec, player, origin);
