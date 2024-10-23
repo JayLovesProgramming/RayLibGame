@@ -4,8 +4,8 @@
 #include <ctime>
 #include "Debug.h"
 
-int frameWidth;
-int frameHeight;
+float frameWidth;
+float frameHeight;
 Rectangle sourceRec;
 bool isRunning = false;
 int currentFrame = 0;

@@ -12,7 +12,7 @@ void CheckForPlayerJump(Player *player)
     {
         float jumpValue = getRandomFloatValue(JUMP_MIN, JUMP_MAX); // Gets a random float value that is randomized between JUMP_MIN and JUMP_MAX
         player->speed = -jumpValue; // Makes the character jump
-        // player->canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc
+        // player->canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc. canJump gets reset when we touch the ground
     }
 }
 
@@ -81,7 +81,7 @@ void HandleMovement(Player *player, float deltaTime)
     }
 }
 
-void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
+void UpdateCamera(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 {
     camera->target = player->position;
     camera->offset = Vector2{width / 2.0f, height / 2.0f};
@@ -178,7 +178,7 @@ int main(void)
 
     // Vector2 origin = {(float)frameWidth, player.sprite.height / 1.0};
     // TODO: Fix loss of data
-    Vector2 origin = {(frameWidth), frameHeight * 1.2}; // Set the origin to the center of width and bottom of the height
+    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.2)}; // Set the origin to the center of width and bottom of the height
 
     Camera2D camera = {0};
     camera.target = player.position;
@@ -186,7 +186,7 @@ int main(void)
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    SetTargetFPS(3000);
+    SetTargetFPS(5000);
     // TODO: Use origin to calc properly
     destRec.width = destRec.width / 1.4;
     destRec.height = destRec.height / 1.4;
@@ -197,14 +197,13 @@ int main(void)
     while (!WindowShouldClose())
     {
    
+        float deltaTime = GetFrameTime();
+
         LoadingScreen.UpdateLoadingBar();
 
-        // Update
-        float deltaTime = GetFrameTime();
         UpdateGameLoop(&player, deltaTime);
 
         camera.zoom += ((float)GetMouseWheelMove() * 0.02f);
-
         if (camera.zoom > 3.0f)
             camera.zoom = 3.0f;
         else if (camera.zoom < 0.25f)
@@ -216,7 +215,7 @@ int main(void)
 
         // Call update camera function by its pointer
         // cameraUpdaters[cameraOption](&camera, &player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
-        UpdateCameraCenterInsideMap(&camera, &player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
+        UpdateCamera(&camera, &player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
 
         // Draw
         BeginDrawing();
