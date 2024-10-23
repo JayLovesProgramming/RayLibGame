@@ -1,3 +1,0 @@
-C:/Users/jayxw/Desktop/RayLibGame/build/CMakeFiles/RayLibGame.dir
-C:/Users/jayxw/Desktop/RayLibGame/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/jayxw/Desktop/RayLibGame/build/CMakeFiles/ZERO_CHECK.dir
