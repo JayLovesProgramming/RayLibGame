@@ -1,7 +1,7 @@
 #include "main.h"
-#include "Animations/WalkAndRunAnimations.cpp"
 #include "Screen.h"
 #include "Debug.h"
+#include "Animations/WalkAndRunAnimations.cpp"
 #include "Audio/Music/Music.cpp"
 #include "UI/LoadingScreen/LoadingScreen.cpp"
 

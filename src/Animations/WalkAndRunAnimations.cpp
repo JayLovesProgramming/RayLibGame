@@ -6,11 +6,11 @@ void WalkAnimation::DebugWalkAnimation()
 {
     if (isRunning)
     {
-        JPrint("Running");
+        std::cout << ("Running") << std::endl;
     }
     else
     {
-        JPrint("Not running");
+        std::cout << ("Not Running") << std::endl;
     }
 }
 
@@ -35,6 +35,6 @@ void WalkAnimation::DoWalkAnimation()
             elapsedTime = 0.0f; // Reset elapsed time
         }
         sourceRec.x = (float)(currentFrame * frameWidth);
-        // JPrint(currentFrame);
+        // std::cout << (currentFrame) std::endl;
     } 
 }

@@ -1,7 +1,6 @@
 #include "raylib.h"
 #include <chrono>
 
-
 void UnloadGame(Texture2D sprite)
 {
     auto start = std::chrono::high_resolution_clock::now();
