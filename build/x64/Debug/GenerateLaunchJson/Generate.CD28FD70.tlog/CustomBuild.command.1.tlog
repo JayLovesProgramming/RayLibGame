@@ -1,0 +1,22 @@
+^C:\USERS\JAYXW\DESKTOP\RAYLIBGAME\BUILD\CMAKEFILES\188957BEAD6C5397F696601E045CF750\GENERATELAUNCHJSON.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "Generating launch.json"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -P C:/Users/jayxw/Desktop/RayLibGame/GenerateLaunchJSON.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JAYXW\DESKTOP\RAYLIBGAME\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/jayxw/Desktop/RayLibGame -BC:/Users/jayxw/Desktop/RayLibGame/build --check-stamp-file C:/Users/jayxw/Desktop/RayLibGame/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "program": "/Debug/RayLibGame.exe",
+            "args": [],
+            "cwd": "C:/Users/jayxw/Desktop/RayLibGame/build",
+            "terminal": "external",
+            "preLaunchTask": "CMake: build"
+        }
+    ]
+}
