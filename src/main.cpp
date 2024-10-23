@@ -147,10 +147,9 @@ int main(void)
     // Initialization
     InitWindow(screenWidth, screenHeight, "JAY");
 
-    // StartMusic();
-    InitAudioDevice();
-    PlayMusicStream(music);
-    ResumeMusicStream(music);
+    MusicPlayer musicPlayer;
+    musicPlayer.StartMusic("assets/music/country.mp3");
+
     // loadGameWindowIcon();
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
@@ -179,9 +178,8 @@ int main(void)
     player.sprite = playerTexture;
 
     // Vector2 origin = {(float)frameWidth, player.sprite.height / 1.0};
-    Vector2 origin = {(float)frameWidth, (float)frameHeight * 1.2}; // Set the origin to the center of width and bottom of the height
-
-    
+    // TODO: Fix loss of data
+    Vector2 origin = {(frameWidth), frameHeight * 1.2}; // Set the origin to the center of width and bottom of the height
 
     Camera2D camera = {0};
     camera.target = player.position;
@@ -198,7 +196,7 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())
     {
-
+        musicPlayer.UpdateMusic();
         // Update loading progress
         if (!loadingComplete)
         {
