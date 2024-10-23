@@ -1,20 +1,19 @@
-   void (*cameraUpdaters[])(Camera2D *, Player *, EnvItem *, int, float, int, int) = {
-        UpdateCameraCenterInsideMap,
-        // UpdateCameraEvenOutOnLanding,
-        // UpdateCameraCenter,
-        // UpdateCameraCenterSmoothFollow,
-        // UpdateCameraPlayerBoundsPush
-    };
-
-// ! OLD CAMERA CODE, ADDED BACK TO THE GAME WHEN IT IS MORE PLAYABLE
 // TODO: Implement these when the game is at a good playing stage
+// void (*cameraUpdaters[])(Camera2D *, Player *, EnvItem *, int, float, int, int) = {
+//     UpdateCameraCenterInsideMap,
+//     // UpdateCameraEvenOutOnLanding,
+//     // UpdateCameraCenter,
+//     // UpdateCameraCenterSmoothFollow,
+//     // UpdateCameraPlayerBoundsPush
+// };
+
 // void UpdateCameraCenter(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 // {
 //     std::cout << "UpdateCameraCenter" << std::endl;
 //     camera->offset = Vector2{ width/2.0f, height/2.0f };
 //     camera->target = player->position;
 // }
-// TODO: Implement these when the game is at a good playing stage
+
 // void UpdateCameraCenterSmoothFollow(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 // {
 //     std::cout << "UpdateCameraCenterSmoothFollow" << std::endl;
@@ -30,7 +29,7 @@
 //         camera->target = Vector2Add(camera->target, Vector2Scale(diff, speed*deltaTime/length));
 //     }
 // }
-// TODO: Implement these when the game is at a good playing stage
+
 // void UpdateCameraEvenOutOnLanding(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 // {
 //     std::cout << "UpdateCameraEvenOutOnLanding" << std::endl;
@@ -69,7 +68,7 @@
 //         }
 //     }
 // }
-// TODO: Implement these when the game is at a good playing stage
+
 // void UpdateCameraPlayerBoundsPush(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 // {
 //     std::cout << "UpdateCameraPlayerBoundsPush" << std::endl;

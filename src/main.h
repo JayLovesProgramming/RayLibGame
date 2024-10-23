@@ -14,13 +14,19 @@ const float rotation = 0.0f;
 #define PLAYER_HOR_SPD 200.0f
 #define SHOULD_W_KEY_JUMP false
 #define ARE_ARROWS_ACTIVATED true
-// #define ARE_ARROWS_SUPER_POWERS_READY false
-#define JUMP_MIN 30
-#define JUMP_MAX 35
-#define PLAYER_JUMP_MULTIPLAYER_JAY 13.0f // Just a multipler, nothing special to see here
 #define JAY_WHITE      CLITERAL(Color){ 255, 255, 255, 235 }
+static const float PLAYER_JUMP_MULTIPLAYER_JAY = 13.0f; // Just a multipler, nothing special to see here
+static constexpr int JUMP_MIN = 30;
+static constexpr int JUMP_MAX = 36;
+static constexpr int DEFAULT_MAP_X_POS = -5000; // ! Set DEFAULT_MAP_POS back to 0 when debugging camera
+static constexpr int DEFAULT_MAP_Y_POS = 500;
+static constexpr int DEFAULT_MAP_HEIGHT = 5000;
+static constexpr int DEFAULT_MAP_WIDTH = 13000;
+
+static constexpr int DEFAULT_PLATFORM_X_POS = (DEFAULT_MAP_X_POS / 6) + 1000;
 
 MusicPlayer musicPlayer;
+// LoadingScreen loadingScreen;
 
 void UnloadGame(Texture2D sprite)
 {
@@ -35,7 +41,7 @@ void UnloadGame(Texture2D sprite)
     std::cout << "Destructor: Game unloaded successfully in " << duration.count() << " ms" << std::endl;
 }
 
-typedef struct Player
+struct Player
 {
     Vector2 position;
     float speed;
@@ -46,42 +52,22 @@ typedef struct Player
     {
         UnloadGame(sprite);
     }
-} Player;
+};
+// typedef struct Player Player; // For C compatability
 
-typedef struct EnvItem
+struct EnvItem
 {
     Rectangle rect;
     int blocking;
     Color color;
-} EnvItem;
+};
+// typedef struct EnvItem EnvItem; // For C compatability
 
 EnvItem envItems[] = {
-        {{0,
-          400,
-          13000,
-          200},
-         1,
-         BLUE},
-        {{300,
-          200,
-          100,
-          10},
-         1,
-         BLUE},
-        {{
-             650, // Lower value goes left, higher value goes right meaning it's the X axis
-             300, // Lower value goes up, higher value goes down meaning it's the Y axis
-             200, // The width of the rect
-             10   // The height of the rect
-         },
-         1,
-         RED},
-        {{950,
-          300,
-          100,
-          10},
-         1,
-         RED}};
+    {{DEFAULT_PLATFORM_X_POS, 400, 600, 10}, 1, BLUE},  
+    {{DEFAULT_PLATFORM_X_POS + 700, 420, 400, 10}, 1, GREEN},  
+    {{DEFAULT_MAP_X_POS, DEFAULT_MAP_Y_POS, DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT}, 1, RED},  
+};
 
 int envItemsLength = sizeof(envItems) / sizeof(envItems[0]);
 

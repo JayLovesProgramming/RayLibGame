@@ -23,7 +23,7 @@ set(JSON_CONTENT "
 ")
 file(WRITE ${JSON_OUTPUT} ${JSON_CONTENT})
 
-set(CMAKE_CXX_STANDARD 11) # Sets the C++ standard (11, 14 or 17)
+set(CMAKE_CXX_STANDARD 20) # Sets the C++ standard (11, 14 or 17)
 
 set(RAYLIB_INCLUDE_DIR "dependencies/raylib/include")
 set(RAYLIB_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/lib")

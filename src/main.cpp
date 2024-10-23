@@ -5,53 +5,65 @@
 #include "Music.h"
 #include "LoadingScreen.h"
 
-// Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again 
-void CheckForPlayerJump(Player *player)
+// Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again
+void CheckForPlayerJump(Player &player)
 {
-    if ((IsKeyDown(KEY_SPACE) || (IsKeyDown(KEY_UP) && ARE_ARROWS_ACTIVATED) || (IsKeyDown(KEY_W) && SHOULD_W_KEY_JUMP)) && player->canJump)
+    if ((IsKeyDown(KEY_SPACE) || (IsKeyDown(KEY_UP) && ARE_ARROWS_ACTIVATED) || (IsKeyDown(KEY_W) && SHOULD_W_KEY_JUMP)) && player.canJump)
     {
         float jumpValue = getRandomFloatValue(JUMP_MIN, JUMP_MAX); // Gets a random float value that is randomized between JUMP_MIN and JUMP_MAX
-        player->speed = -jumpValue; // Makes the character jump
-        // player->canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc. canJump gets reset when we touch the ground
+        player.speed = -jumpValue;                                // Makes the character jump
+        // player.canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc. canJump gets reset when we touch the ground
     }
+}
+
+void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
+{
+    for (int i = 0; i < envItemsLength; i++)
+    {
+        DrawRectangleRec(envItems[i].rect, envItems[i].color); // Ground surface rectangle
+    }
+    destRec.x = player.position.x;
+    destRec.y = player.position.y;
+    DrawTexturePro(player.sprite, sourceRec, destRec, origin, (float)rotation, WHITE);
+    DrawCircleV(player.position, 8.0f, BLACK);
+    WalkAnimation();
 }
 
 // Checks if you are on top of a platform a.k.a a rectangle or platform
 // TODO: Add more collision checks to check the bottom and sides of the rectangle so the player collides with the rectangle all round (a bit like super mario)
-void CheckForCollisionCollide(Player *player, float deltaTime)
+void CheckForCollisionCollide(Player &player, float deltaTime)
 {
-     // Collision detection with environment items
+    // Collision detection with environment items
     bool onGround = false;
     for (int i = 0; i < envItemsLength; i++)
     {
         EnvItem *ei = &envItems[i];
-        if (ei->blocking && 
-        // CheckCollisionRecs(player->rect, ei->rect) &&
-            ei->rect.x <= player->position.x &&
-            ei->rect.x + ei->rect.width >= player->position.x &&
-            ei->rect.y >= player->position.y &&
-            ei->rect.y <= player->position.y + player->speed * deltaTime)
+        if (ei->blocking &&
+            // CheckCollisionRecs(player.rect, ei.rect) &&
+            ei->rect.x <= player.position.x &&
+            ei->rect.x + ei->rect.width >= player.position.x &&
+            ei->rect.y >= player.position.y &&
+            ei->rect.y <= player.position.y + player.speed * deltaTime)
         {
             onGround = true;
-            player->speed = 0.0f;
-            player->position.y = ei->rect.y; // Snap player to the top of the obstacle
+            player.speed = 0.0f;
+            player.position.y = ei->rect.y; // Snap player to the top of the obstacle
             break;
         }
     }
 
     if (onGround)
     {
-        player->canJump = true; // Can jump again if hit obstacle
+        player.canJump = true; // Can jump again if hit obstacle
         return;
     }
-
     // Update player vertical position and apply gravity if not hitting an obstacle
-    player->position.y += player->speed * deltaTime;
-    player->speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
-    player->canJump = false;                     // Can't jump while falling
+    player.position.y += player.speed * deltaTime;
+    player.speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
+    player.canJump = false;                     // Can't jump while falling
 }
 
-void HandleMovement(Player *player, float deltaTime)
+void HandleMovement(Player &player, float deltaTime)
 {
     bool movingLeft = (IsKeyDown(KEY_LEFT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_A);
     bool movingRight = (IsKeyDown(KEY_RIGHT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_D);
@@ -63,28 +75,28 @@ void HandleMovement(Player *player, float deltaTime)
     }
     else if (movingLeft)
     {
-        player->position.x -= PLAYER_HOR_SPD * deltaTime;
+        player.position.x -= PLAYER_HOR_SPD * deltaTime;
         isRunning = true;
-        if (player->sprite.width > 0) // Only negate if it's positive (facing right)
+        if (player.sprite.width > 0) // Only negate if it's positive (facing right)
         {
-            player->sprite.width = -player->sprite.width; // Flip sprite to face left
+            player.sprite.width = -player.sprite.width; // Flip sprite to face left
         }
     }
     else if (movingRight)
     {
-        player->position.x += PLAYER_HOR_SPD * deltaTime;
+        player.position.x += PLAYER_HOR_SPD * deltaTime;
         isRunning = true;
-        if (player->sprite.width <= 0) // Only negate if it's positive (facing right)
+        if (player.sprite.width <= 0) // Only negate if it's positive (facing right)
         {
-            player->sprite.width = -player->sprite.width; // Flip sprite to face left
+            player.sprite.width = -player.sprite.width; // Flip sprite to face left
         }
     }
 }
 
-void UpdateCamera(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
+void UpdateCamera(Camera2D &camera, Player &player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 {
-    camera->target = player->position;
-    camera->offset = Vector2{width / 2.0f, height / 2.0f};
+    camera.target = player.position;
+    camera.offset = Vector2{width / 2.0f, height / 2.0f};
     float minX = 0, minY = 0, maxX = 0, maxY = 0;
     for (int i = 0; i < envItemsLength; i++)
     {
@@ -98,33 +110,26 @@ void UpdateCamera(Camera2D *camera, Player *player, EnvItem *envItems, int envIt
         }
     }
     // Clamp camera within the environment
-    if (camera->target.x < minX + width / 2)
-        camera->target.x = minX + width / 2;
-    if (camera->target.x > maxX - width / 2)
-        camera->target.x = maxX - width / 2;
-    if (camera->target.y < minY + height / 2)
-        camera->target.y = minY + height / 2;
-    if (camera->target.y > maxY - height / 2)
-        camera->target.y = maxY - height / 2;
+    if (camera.target.x < minX + width / 2)
+        camera.target.x = minX + width / 2;
+    if (camera.target.x > maxX - width / 2)
+        camera.target.x = maxX - width / 2;
+    if (camera.target.y < minY + height / 2)
+        camera.target.y = minY + height / 2;
+    if (camera.target.y > maxY - height / 2)
+        camera.target.y = maxY - height / 2;
+
+    camera.zoom += ((float)GetMouseWheelMove() * 0.05f);
+    // Use std::clamp instead here
+    if (camera.zoom >= 1.26f)
+        camera.zoom = 1.26f;
+    else if (camera.zoom < 0.54f)
+        camera.zoom = 0.54f;
 }
 
-void LoadGameWindowIcon()
-{
-    Image windowIcon = LoadImage("assets/logo/logo.png");
-    SetWindowIcon(windowIcon);
-}
-
-void ResetCameraZoom(Camera2D camera, Player player)
-{
-    if (IsKeyPressed(KEY_R))
-    {
-        camera.zoom = 1.0f;
-        player.position = Vector2{400, 280};
-    }
-}
 
 // Update player loop
-void UpdatePlayer(Player *player, float deltaTime)
+void UpdatePlayer(Player &player, float deltaTime)
 {
     HandleMovement(player, deltaTime);
     CheckForCollisionCollide(player, deltaTime);
@@ -132,12 +137,11 @@ void UpdatePlayer(Player *player, float deltaTime)
 }
 
 // Main update loop
-void UpdateGameLoop(Player *player, float deltaTime)
+void UpdateGameLoop(Player &player, float deltaTime)
 {
     musicPlayer.UpdateMusic();
     UpdatePlayer(player, deltaTime);
 }
-
 
 // Program main entry point
 int main(void)
@@ -148,7 +152,6 @@ int main(void)
     // Initialization
     InitWindow(screenWidth, screenHeight, "JAY");
 
-    // LoadGameWindowIcon();
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -157,10 +160,14 @@ int main(void)
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     // double time = GetTime();
 
-    MusicPlayer musicPlayer;
+    MusicPlayer musicPlayer = {};
+    LoadingScreen loadingScreen = {};
+    Player player = {0};
+    Camera2D camera = {0};
+    Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
+    
     musicPlayer.StartMusic("assets/music/country.mp3");
 
-    Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
 
@@ -170,8 +177,7 @@ int main(void)
     // Destination rectangle (screen rectangle where drawing part of texture)
     Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f};
 
-    Player player = {0};
-    player.position = Vector2{400, 280};
+    player.position = Vector2{0, 280};
     player.speed = 0;
     player.canJump = false;
     player.sprite = playerTexture;
@@ -180,7 +186,6 @@ int main(void)
     // TODO: Fix loss of data
     Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.2)}; // Set the origin to the center of width and bottom of the height
 
-    Camera2D camera = {0};
     camera.target = player.position;
     camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
     camera.rotation = 0.0f;
@@ -190,52 +195,36 @@ int main(void)
     // TODO: Use origin to calc properly
     destRec.width = destRec.width / 1.4;
     destRec.height = destRec.height / 1.4;
-    LoadingScreen LoadingScreen;
 
     // player.sprite.width =  player.sprite.width / 1.5;
     // Main game loop
     while (!WindowShouldClose())
     {
-   
+
         float deltaTime = GetFrameTime();
 
-        LoadingScreen.UpdateLoadingBar();
+        UpdateGameLoop(player, deltaTime);
+        loadingScreen.UpdateLoadingBar();
 
-        UpdateGameLoop(&player, deltaTime);
+        UpdateCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
 
-        camera.zoom += ((float)GetMouseWheelMove() * 0.02f);
-        if (camera.zoom > 3.0f)
-            camera.zoom = 3.0f;
-        else if (camera.zoom < 0.25f)
-            camera.zoom = 0.25f;
-        // ResetCameraZoom(camera, player);
-
-        // if (IsKeyPressed(KEY_C))
-        //     cameraOption = (cameraOption + 1) % cameraUpdatersLength;
-
-        // Call update camera function by its pointer
-        // cameraUpdaters[cameraOption](&camera, &player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
-        UpdateCamera(&camera, &player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
+        if (IsKeyPressed(KEY_R))
+        {
+            camera.zoom = 1.0f;
+            player.position = Vector2{400, 280};
+        }
 
         // Draw
         BeginDrawing();
         ClearBackground(WHITE);
+
         // Draw loading text
-        LoadingScreen.DrawLoadingBar(screenWidth, screenHeight);
+        loadingScreen.DrawLoadingBar(screenWidth, screenHeight);
 
         if (loadingComplete)
         {
             BeginMode2D(camera);
-            for (int i = 0; i < envItemsLength; i++)
-            {
-                DrawRectangleRec(envItems[i].rect, envItems[i].color);
-            }
-            destRec.x = player.position.x;
-            destRec.y = player.position.y;
-
-            DrawTexturePro(player.sprite, sourceRec, destRec, origin, (float)rotation, WHITE);
-            DrawCircleV(player.position, 8.0f, BLACK);
-            walkAnimation();
+            DrawEssentials(destRec, player, origin);
             EndMode2D();
             DrawText(TextFormat("FPS: %d", GetFPS()), 40, 40, 40, MAROON);
         }
@@ -246,3 +235,9 @@ int main(void)
     CloseWindow();
     return 0;
 }
+
+
+// Something Amit on Twitch taught me, legend
+// int a[] = {0, 1, 2}; // Declare an array 'a' with elements 0, 1, and 2.
+// int b = 2[a];       // Equivalent to a[3], which is out of bounds.
+// std::cout << b << std::endl;

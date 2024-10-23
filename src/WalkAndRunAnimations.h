@@ -26,7 +26,7 @@ void debugWalkAnimation()
     }
 }
 
-void walkAnimation()
+void WalkAnimation()
 {
     // debugWalkAnimation();
     if (!isRunning)
