@@ -1,3 +1,6 @@
+// TODO: Create a level editor type of thing...
+// TODO: Make it read from JSON preferably
+
 // #include "main.h"
 
 // EnvItem envItems[] = {

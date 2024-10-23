@@ -1,5 +1,3 @@
-// const int screenWidth = 1920;
-// const int screenHeight = 1080;
 #include "raylib.h"
 #include "Debug.h"
 

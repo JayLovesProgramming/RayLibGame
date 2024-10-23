@@ -4,13 +4,14 @@ project(RayLibGame CXX) # Project name and the language (C++)
 
 set(CMAKE_CXX_STANDARD 11) # Sets the C++ standard (11, 14 or 17)
 
-set(RAYLIB_INCLUDE_DIR "C:/Users/jayxw/Desktop/RayLibGame/raylib/include")
-set(RAYLIB_LIB_DIR "C:/Users/jayxw/Desktop/RayLibGame/raylib/lib")
+set(RAYLIB_INCLUDE_DIR "dependencies/raylib/include")
+set(RAYLIB_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/lib")
 
 include_directories((${RAYLIB_INCLUDE_DIR})) # Include directories
 add_executable(${PROJECT_NAME}  src/main.cpp)
+target_link_libraries(${PROJECT_NAME} ${RAYLIB_LIB_DIR}/raylib.lib)
 
-# RELEASE BUILD ONLY
+# RELEASE BUILD ONLY (hides debug console)
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
 # DEV BUILD ONLY
@@ -25,4 +26,3 @@ if (WIN32)
     target_link_libraries(${PROJECT_NAME} opengl32 gdi32 winmm)
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${RAYLIB_LIB_DIR}/raylib.lib)

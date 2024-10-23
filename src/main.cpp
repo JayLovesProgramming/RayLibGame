@@ -4,8 +4,7 @@
 #include "Debug.h"
 #include "Levels.h"
 
-float rotation = 0.0f;
-
+// Main update loop
 void updateLoop()
 {
     updateScreen();
@@ -14,7 +13,6 @@ void updateLoop()
 // Jumping logic
 void playerJump(Player *player)
 {
-
     if ((IsKeyDown(KEY_SPACE) || (IsKeyDown(KEY_UP) && ARE_ARROWS_ACTIVATED) || (IsKeyDown(KEY_W) && SHOULD_W_KEY_JUMP)) && player->canJump)
     {
         player->canJump = false;
@@ -24,7 +22,40 @@ void playerJump(Player *player)
     }
 }
 
-void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, Rectangle sourceRec)
+void collisionCheck(Player *player, float deltaTime)
+{
+     // Collision detection with environment items
+    bool hitObstacle = false;
+    for (int i = 0; i < envItemsLength; i++)
+    {
+        EnvItem *ei = &envItems[i];
+        if (ei->blocking && 
+        // CheckCollisionRecs(player->rect, ei->rect) &&
+            ei->rect.x <= player->position.x &&
+            ei->rect.x + ei->rect.width >= player->position.x &&
+            ei->rect.y >= player->position.y &&
+            ei->rect.y <= player->position.y + player->speed * deltaTime)
+        {
+            hitObstacle = true;
+            player->speed = 0.0f;
+            player->position.y = ei->rect.y; // Snap player to the top of the obstacle
+            break;
+        }
+    }
+    // Update player vertical position and apply gravity if not hitting an obstacle
+    if (!hitObstacle)
+    {
+        player->position.y += player->speed * deltaTime;
+        player->speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
+        player->canJump = false;                     // Can't jump while falling
+    }
+    else
+    {
+        player->canJump = true; // Can jump again if hit obstacle
+    }
+}
+
+void HandleMovement(Player *player, float deltaTime)
 {
     // Movement
     bool movingLeft = (IsKeyDown(KEY_LEFT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_A);
@@ -53,38 +84,14 @@ void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float d
             player->sprite.width = -player->sprite.width; // Flip sprite to face left
         }
     }
+}
+
+// Update player loop
+void UpdatePlayer(Player *player, float deltaTime)
+{
+    HandleMovement(player, deltaTime);
     playerJump(player);
-
-    // Collision detection with environment items
-    bool hitObstacle = false;
-    for (int i = 0; i < envItemsLength; i++)
-    {
-        EnvItem *ei = &envItems[i];
-        if (ei->blocking && 
-        // CheckCollisionRecs(player->rect, ei->rect) &&
-            ei->rect.x <= player->position.x &&
-            ei->rect.x + ei->rect.width >= player->position.x &&
-            ei->rect.y >= player->position.y &&
-            ei->rect.y <= player->position.y + player->speed * deltaTime)
-        {
-            hitObstacle = true;
-            player->speed = 0.0f;
-            player->position.y = ei->rect.y; // Snap player to the top of the obstacle
-            break;
-        }
-    }
-
-    // Update player vertical position and apply gravity if not hitting an obstacle
-    if (!hitObstacle)
-    {
-        player->position.y += player->speed * deltaTime;
-        player->speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
-        player->canJump = false;                     // Can't jump while falling
-    }
-    else
-    {
-        player->canJump = true; // Can jump again if hit obstacle
-    }
+    collisionCheck(player, deltaTime);
 }
 
 void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
@@ -201,9 +208,9 @@ int main(void)
         float deltaTime = GetFrameTime();
 
 
-        UpdatePlayer(&player, envItems, envItemsLength, deltaTime, sourceRec);
+        UpdatePlayer(&player, deltaTime);
 
-        camera.zoom += ((float)GetMouseWheelMove() * 0.05f);
+        camera.zoom += ((float)GetMouseWheelMove() * 0.02f);
 
         if (camera.zoom > 3.0f)
             camera.zoom = 3.0f;
@@ -220,7 +227,6 @@ int main(void)
 
         // Draw
         BeginDrawing();
-
         ClearBackground(WHITE);
         // Draw loading text
         if (!loadingComplete)
@@ -251,7 +257,6 @@ int main(void)
     }
 
     // De-Initialization
-    UnloadTexture(player.sprite);
     CloseWindow();
     return 0;
 }
