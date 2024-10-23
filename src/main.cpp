@@ -2,32 +2,26 @@
 #include "WalkAndRunAnimations.h"
 #include "Screen.h"
 #include "Debug.h"
-#include "Levels.h"
 #include "Music.h"
+#include "LoadingScreen.h"
 
-// Main update loop
-void updateLoop()
-{
-    // UpdateMusicStream(music);   // Update music buffer with new stream data
-    updateScreen();
-}
-
-// Jumping logic
-void playerJump(Player *player)
+// Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again 
+void CheckForPlayerJump(Player *player)
 {
     if ((IsKeyDown(KEY_SPACE) || (IsKeyDown(KEY_UP) && ARE_ARROWS_ACTIVATED) || (IsKeyDown(KEY_W) && SHOULD_W_KEY_JUMP)) && player->canJump)
     {
-        player->canJump = false;
-        float jumpValue = getRandomFloatValue(JUMP_MIN, JUMP_MAX);
-        std::cout << "Jump value: " << jumpValue << std::endl;
-        player->speed = -jumpValue; // Apply jump speed
+        float jumpValue = getRandomFloatValue(JUMP_MIN, JUMP_MAX); // Gets a random float value that is randomized between JUMP_MIN and JUMP_MAX
+        player->speed = -jumpValue; // Makes the character jump
+        // player->canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc
     }
 }
 
-void collisionCheck(Player *player, float deltaTime)
+// Checks if you are on top of a platform a.k.a a rectangle or platform
+// TODO: Add more collision checks to check the bottom and sides of the rectangle so the player collides with the rectangle all round (a bit like super mario)
+void CheckForCollisionCollide(Player *player, float deltaTime)
 {
      // Collision detection with environment items
-    bool hitObstacle = false;
+    bool onGround = false;
     for (int i = 0; i < envItemsLength; i++)
     {
         EnvItem *ei = &envItems[i];
@@ -38,28 +32,27 @@ void collisionCheck(Player *player, float deltaTime)
             ei->rect.y >= player->position.y &&
             ei->rect.y <= player->position.y + player->speed * deltaTime)
         {
-            hitObstacle = true;
+            onGround = true;
             player->speed = 0.0f;
             player->position.y = ei->rect.y; // Snap player to the top of the obstacle
             break;
         }
     }
-    // Update player vertical position and apply gravity if not hitting an obstacle
-    if (!hitObstacle)
-    {
-        player->position.y += player->speed * deltaTime;
-        player->speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
-        player->canJump = false;                     // Can't jump while falling
-    }
-    else
+
+    if (onGround)
     {
         player->canJump = true; // Can jump again if hit obstacle
+        return;
     }
+
+    // Update player vertical position and apply gravity if not hitting an obstacle
+    player->position.y += player->speed * deltaTime;
+    player->speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
+    player->canJump = false;                     // Can't jump while falling
 }
 
 void HandleMovement(Player *player, float deltaTime)
 {
-    // Movement
     bool movingLeft = (IsKeyDown(KEY_LEFT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_A);
     bool movingRight = (IsKeyDown(KEY_RIGHT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_D);
     bool justStoppedMoving = (IsKeyReleased(KEY_LEFT) || IsKeyReleased(KEY_A) || IsKeyReleased(KEY_RIGHT) || IsKeyReleased(KEY_D));
@@ -86,14 +79,6 @@ void HandleMovement(Player *player, float deltaTime)
             player->sprite.width = -player->sprite.width; // Flip sprite to face left
         }
     }
-}
-
-// Update player loop
-void UpdatePlayer(Player *player, float deltaTime)
-{
-    HandleMovement(player, deltaTime);
-    playerJump(player);
-    collisionCheck(player, deltaTime);
 }
 
 void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
@@ -123,7 +108,7 @@ void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envI
         camera->target.y = maxY - height / 2;
 }
 
-void loadGameWindowIcon()
+void LoadGameWindowIcon()
 {
     Image windowIcon = LoadImage("assets/logo/logo.png");
     SetWindowIcon(windowIcon);
@@ -138,6 +123,22 @@ void ResetCameraZoom(Camera2D camera, Player player)
     }
 }
 
+// Update player loop
+void UpdatePlayer(Player *player, float deltaTime)
+{
+    HandleMovement(player, deltaTime);
+    CheckForCollisionCollide(player, deltaTime);
+    CheckForPlayerJump(player);
+}
+
+// Main update loop
+void UpdateGameLoop(Player *player, float deltaTime)
+{
+    musicPlayer.UpdateMusic();
+    UpdatePlayer(player, deltaTime);
+}
+
+
 // Program main entry point
 int main(void)
 {
@@ -147,10 +148,7 @@ int main(void)
     // Initialization
     InitWindow(screenWidth, screenHeight, "JAY");
 
-    MusicPlayer musicPlayer;
-    musicPlayer.StartMusic("assets/music/country.mp3");
-
-    // loadGameWindowIcon();
+    // LoadGameWindowIcon();
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -158,6 +156,9 @@ int main(void)
     // SetWindowState(FLAG_WINDOW_UNDECORATED);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     // double time = GetTime();
+
+    MusicPlayer musicPlayer;
+    musicPlayer.StartMusic("assets/music/country.mp3");
 
     Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
     frameWidth = playerTexture.width / 6;
@@ -168,8 +169,6 @@ int main(void)
 
     // Destination rectangle (screen rectangle where drawing part of texture)
     Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f};
-
-    // Origin of the texture (rotation/scale point), it's relative to destination rectangle size
 
     Player player = {0};
     player.position = Vector2{400, 280};
@@ -191,29 +190,18 @@ int main(void)
     // TODO: Use origin to calc properly
     destRec.width = destRec.width / 1.4;
     destRec.height = destRec.height / 1.4;
+    LoadingScreen LoadingScreen;
 
     // player.sprite.width =  player.sprite.width / 1.5;
     // Main game loop
     while (!WindowShouldClose())
     {
-        musicPlayer.UpdateMusic();
-        // Update loading progress
-        if (!loadingComplete)
-        {
-            loadingProgress += loadingSpeed;
-            if (loadingProgress >= 1.0f)
-            {
-                loadingProgress = 1.0f;
-                loadingComplete = true; // Set loading complete when progress reaches 100%
-            }
-        }
+   
+        LoadingScreen.UpdateLoadingBar();
 
-        updateLoop();
         // Update
         float deltaTime = GetFrameTime();
-
-
-        UpdatePlayer(&player, deltaTime);
+        UpdateGameLoop(&player, deltaTime);
 
         camera.zoom += ((float)GetMouseWheelMove() * 0.02f);
 
@@ -234,14 +222,8 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
         // Draw loading text
-        if (!loadingComplete)
-        {
-            DrawRectangle(0, 0, 1000000, 1000000, GRAY);
-            DrawText("Loading...", screenWidth / 2 - 50, screenHeight / 2 - 40, 20, DARKGRAY);
-            DrawRectangle(screenWidth / 2 - 100, screenHeight / 2, 200, 20, LIGHTGRAY);
-            DrawRectangle(screenWidth / 2 - 100, screenHeight / 2, (int)(200 * loadingProgress), 20, GREEN);
-            // DrawText("Loading Complete!", screenWidth / 2 - 80, screenHeight / 2 + 30, 20, DARKGREEN);
-        }
+        LoadingScreen.DrawLoadingBar(screenWidth, screenHeight);
+
         if (loadingComplete)
         {
             BeginMode2D(camera);

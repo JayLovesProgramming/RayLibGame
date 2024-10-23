@@ -3,14 +3,14 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include "Music.h"
 
-float loadingProgress = 0.0f;
-bool loadingComplete = true;
+
 
 const float rotation = 0.0f;
-const float loadingSpeed = 0.005f;
 
 // TODO: Make gravity value reverse
+// Learn: Difference between defining stuff like below or using const float or const bool for example
 #define PLAYER_GRAVITY 800 // Lower values = floater
 #define PLAYER_JUMP_SPD 350.0f
 #define PLAYER_HOR_SPD 200.0f
@@ -22,11 +22,19 @@ const float loadingSpeed = 0.005f;
 #define PLAYER_JUMP_MULTIPLAYER_JAY 13.0f // Just a multipler, nothing special to see here
 #define JAY_WHITE      CLITERAL(Color){ 255, 255, 255, 235 }
 
-void UnloadGame(std::chrono::steady_clock::time_point start)
+MusicPlayer musicPlayer;
+
+void UnloadGame(Texture2D sprite)
 {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    UnloadTexture(sprite);
+    musicPlayer.UnloadMusicPlayer();
+
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration = end - start;
-    std::cout << "Game unloaded successfully in " << duration.count() << " ms" << std::endl;
+
+    std::cout << "Destructor: Game unloaded successfully in " << duration.count() << " ms" << std::endl;
 }
 
 typedef struct Player
@@ -38,9 +46,7 @@ typedef struct Player
     // Destructor
     ~Player()
     {
-        auto start = std::chrono::high_resolution_clock::now();
-        UnloadTexture(sprite);
-        UnloadGame(start);
+        UnloadGame(sprite);
     }
 } Player;
 

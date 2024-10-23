@@ -1,12 +1,14 @@
 #pragma once
 
+#include <iostream>
+
+template<typename T>
+
 #define DEBUG true
 #define debug DEBUG
 #define DEBUG_ACTIVE DEBUG
 #define DEBUG_ENABLED DEBUG_ACTIVE
-#include <iostream>
-
-template<typename T>
+#define MUSIC_ENABLED false
 
 void JPrint(T message)
 {   

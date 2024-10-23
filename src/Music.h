@@ -1,47 +1,51 @@
-// MusicPlayer.h
-#ifndef MUSIC_PLAYER_H
-#define MUSIC_PLAYER_H
+// Music.h
+#pragma once
 
 #include "raylib.h"
+#include "Debug.h"
+#include <iostream>
 
-class MusicPlayer {
+int MusicSampleRate;
+
+class MusicPlayer
+{
 private:
     Music music;
-    bool isLoaded; // To check if music is loaded
 
 public:
-    MusicPlayer() : isLoaded(false) {}
-
     // Initialize the audio device and load the music stream
-    void StartMusic(const char* filePath) {
-        if (!isLoaded) {
-            InitAudioDevice();  // Initialize audio device
+    void StartMusic(const char *filePath)
+    {
+        InitAudioDevice(); // Initialize audio device
+        if (MUSIC_ENABLED)
+        {
+            MusicSampleRate = music.stream.sampleRate;
             music = LoadMusicStream(filePath); // Load music file
-            PlayMusicStream(music); // Play the music stream
-            isLoaded = true; // Mark music as loaded
+            PlayMusicStream(music);            // Play the music stream
         }
     }
 
+    void UnloadMusicPlayer()
+    {
+        if (MUSIC_ENABLED && MusicSampleRate != 0)
+        {
+            UnloadMusicStream(music); // Unload the music stream
+        }
+        CloseAudioDevice(); // Close audio device if it was initialized
+        std::cout << "Destructor: Music unloaded and audio device closed" << std::endl;
+    }
+
     // Update the music stream
-    void UpdateMusic() {
-        if (isLoaded) {
+    void UpdateMusic()
+    {
+        if (MUSIC_ENABLED && MusicSampleRate != 0)
+        {
             UpdateMusicStream(music); // Update music buffer with new stream data
         }
     }
 
-    // Cleanup music resources
-    void CleanupMusic() {
-        if (isLoaded) {
-            UnloadMusicStream(music); // Unload the music stream
-            CloseAudioDevice(); // Close audio device if it was initialized
-            isLoaded = false; // Mark music as unloaded
-        }
-    }
+    // ~MusicPlayer()
+    // {
 
-    // Check if music is playing
-    bool IsPlaying() const {
-        // return isLoaded && IsMusicPlaying(music);
-    }
+    // }
 };
-
-#endif // MUSIC_PLAYER_H

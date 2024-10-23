@@ -1,8 +1,9 @@
 #include "raylib.h"
 #include "Debug.h"
 
-int screenWidth = 1280;
-int screenHeight = 720;
+
+int screenWidth = 1920;
+int screenHeight = 1080;
 
 void updateScreen()
 {
