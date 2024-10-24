@@ -1,4 +1,7 @@
+#pragma once
+
 #include "raylib.h"
+#include "main.h"
 #include <chrono>
 
 void UnloadGame(Texture2D sprite)

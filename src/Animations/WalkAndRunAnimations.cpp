@@ -1,7 +1,5 @@
 #include "WalkAndRunAnimations.h"
 
-WalkAnimation walkAnimation;
-
 void WalkAnimation::DebugWalkAnimation()
 {
     if (isRunning)
@@ -14,7 +12,7 @@ void WalkAnimation::DebugWalkAnimation()
     }
 }
 
-void WalkAnimation::DoWalkAnimation()
+void WalkAnimation::DrawWalkAnim()
 {
     // DebugWalkAnimation();
     if (!isRunning)

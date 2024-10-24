@@ -1,4 +1,4 @@
-
+#pragma once
 #include "Player.h"
 
 static constexpr int DEFAULT_MAP_X_POS = -5000; // ! Set DEFAULT_MAP_POS back to 0 when debugging camera

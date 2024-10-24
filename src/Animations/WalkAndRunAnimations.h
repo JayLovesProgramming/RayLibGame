@@ -23,5 +23,5 @@ public:
     int currentFrame = 0;
     float walkSpeed = 0.2f;
 
-    void DoWalkAnimation();
+    void DrawWalkAnim();
 };

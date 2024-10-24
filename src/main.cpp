@@ -1,20 +1,11 @@
 #include "main.h"
 #include "Screen.h"
 #include "Debug.h"
-#include "Animations/WalkAndRunAnimations.cpp"
 #include "Audio/Music/Music.cpp"
 #include "Utils/Utils.cpp"
-
-// Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again
-void CheckForPlayerJump(Player &player)
-{
-    if ((IsKeyDown(KEY_SPACE) || (IsKeyDown(KEY_UP) && ARE_ARROWS_ACTIVATED) || (IsKeyDown(KEY_W) && SHOULD_W_KEY_JUMP)) && player.canJump)
-    {
-        float jumpValue = getRandomFloatValue(JUMP_MIN, JUMP_MAX); // Gets a random float value that is randomized between JUMP_MIN and JUMP_MAX
-        player.speed = -jumpValue;                                 // Makes the character jump
-        // player.canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc. canJump gets reset when we touch the ground
-    }
-}
+#include "Movement/Jump.cpp"
+#include "Movement/Movement.cpp"
+#include "Animations/WalkAndRunAnimations.cpp"
 
 void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
 {
@@ -26,7 +17,7 @@ void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
     destRec.y = player.position.y;
     DrawTexturePro(player.sprite, sourceRec, destRec, origin, (float)spriteRotation, WHITE);
     DrawCircleV(player.position, 8.0f, BLACK);
-    walkAnimation.DoWalkAnimation();
+    walkAnimation.DrawWalkAnim();
 }
 
 // Checks if you are on top of a platform a.k.a a rectangle or platform
@@ -61,36 +52,6 @@ void CheckForCollisionCollide(Player &player, float deltaTime)
     player.position.y += player.speed * deltaTime;
     player.speed += PLAYER_GRAVITY * deltaTime; // Apply gravity
     player.canJump = false;                     // Can't jump while falling
-}
-
-void HandleMovement(Player &player, float deltaTime)
-{
-    bool movingLeft = (IsKeyDown(KEY_LEFT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_A);
-    bool movingRight = (IsKeyDown(KEY_RIGHT) && ARE_ARROWS_ACTIVATED) || IsKeyDown(KEY_D);
-    bool justStoppedMoving = (IsKeyReleased(KEY_LEFT) || IsKeyReleased(KEY_A) || IsKeyReleased(KEY_RIGHT) || IsKeyReleased(KEY_D));
-
-    if (justStoppedMoving)
-    {
-        walkAnimation.isRunning = false;
-    }
-    else if (movingLeft)
-    {
-        player.position.x -= PLAYER_HOR_SPD * deltaTime;
-        walkAnimation.isRunning = true;
-        if (player.sprite.width > 0) // Only negate if it's positive (facing right)
-        {
-            player.sprite.width = -player.sprite.width; // Flip sprite to face left
-        }
-    }
-    else if (movingRight)
-    {
-        player.position.x += PLAYER_HOR_SPD * deltaTime;
-        walkAnimation.isRunning = true;
-        if (player.sprite.width <= 0) // Only negate if it's positive (facing right)
-        {
-            player.sprite.width = -player.sprite.width; // Flip sprite to face left
-        }
-    }
 }
 
 void UpdateCamera(Camera2D &camera, Player &player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
@@ -159,38 +120,33 @@ void InitalizeGame()
 int main(void)
 {
     InitalizeGame();
-    Player player = {0};
-    Camera2D camera = {0};
-    Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
 
     MusicPlayer musicPlayer = {};
     musicPlayer.StartMainGameMusic("assets/music/country.mp3");
 
+    Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
+    
+    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.2)}; // Set the origin to the center of width and bottom of the height
+    sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight}; // Source rectangle (part of the texture to use for drawing)
 
-    // Source rectangle (part of the texture to use for drawing)
-    sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight};
-
-    // Destination rectangle (screen rectangle where drawing part of texture)
-    Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f};
-
+    Player player = {0};
     player.position = Vector2{0, 280};
     player.speed = 0;
     player.canJump = false;
     player.sprite = playerTexture;
 
-    // Vector2 origin = {(float)frameWidth, player.sprite.height / 1.0};
-    // TODO: Fix loss of data
-    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.2)}; // Set the origin to the center of width and bottom of the height
-
+    Camera2D camera = {0};
     camera.target = player.position;
     camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
     SetTargetFPS(5000);
+    
     // TODO: Use origin to calc properly
+    Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f}; // Destination rectangle (screen rectangle where drawing part of texture)
     destRec.width = destRec.width / 1.4;
     destRec.height = destRec.height / 1.4;
 
