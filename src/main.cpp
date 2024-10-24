@@ -156,7 +156,7 @@ int main(void)
     camera.target = player.position;
     camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.zoom = 0.5f;
 
     SetTargetFPS(5000);
 
