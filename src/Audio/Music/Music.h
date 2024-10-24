@@ -3,6 +3,8 @@
 #include "raylib.h"
 #include "Debug.h"
 #include <thread>
+#include <chrono>
+#include <iostream>
 
 int MusicSampleRate = 0;
 

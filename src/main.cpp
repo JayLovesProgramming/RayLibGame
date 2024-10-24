@@ -1,11 +1,13 @@
 #include "main.h"
 #include "Screen.h"
 #include "Debug.h"
+
 #include "Audio/Music/Music.cpp"
 #include "Utils/Utils.cpp"
 #include "Movement/Jump.cpp"
 #include "Movement/Movement.cpp"
 #include "Animations/WalkAndRunAnimations.cpp"
+#include "Camera/Camera.cpp"
 
 void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
 {
@@ -54,39 +56,6 @@ void CheckForCollisionCollide(Player &player, float deltaTime)
     player.canJump = false;                     // Can't jump while falling
 }
 
-void UpdateCamera(Camera2D &camera, Player &player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
-{
-    camera.target = player.position;
-    camera.offset = Vector2{width / 2.0f, height / 2.0f};
-    float minX = 0, minY = 0, maxX = 0, maxY = 0;
-    for (int i = 0; i < envItemsLength; i++)
-    {
-        EnvItem *ei = &envItems[i];
-        if (ei->blocking)
-        {
-            minX = fminf(ei->rect.x, minX);
-            maxX = fmaxf(ei->rect.x + ei->rect.width, maxX);
-            minY = fminf(ei->rect.y, minY);
-            maxY = fmaxf(ei->rect.y + ei->rect.height, maxY);
-        }
-    }
-    // Clamp camera within the environment
-    if (camera.target.x < minX + width / 2)
-        camera.target.x = minX + width / 2;
-    if (camera.target.x > maxX - width / 2)
-        camera.target.x = maxX - width / 2;
-    if (camera.target.y < minY + height / 2)
-        camera.target.y = minY + height / 2;
-    if (camera.target.y > maxY - height / 2)
-        camera.target.y = maxY - height / 2;
-
-    camera.zoom += ((float)GetMouseWheelMove() * 0.05f);
-    // Use std::clamp instead here
-    if (camera.zoom >= 1.26f)
-        camera.zoom = 1.26f;
-    else if (camera.zoom < 0.54f)
-        camera.zoom = 0.54f;
-}
 
 // Update player loop
 void UpdatePlayer(Player &player, float deltaTime)
@@ -104,9 +73,7 @@ void UpdateGameLoop(Player &player, float deltaTime)
 
 void InitalizeGame()
 {
-    // Randomize the seed
-    srand(static_cast<unsigned int>(time(nullptr)));
-    // Initialization
+    srand(static_cast<unsigned int>(time(nullptr))); // Randomize the seed
     InitWindow(screenWidth, screenHeight, "JAY");
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
@@ -171,6 +138,19 @@ int main(void)
     CloseWindow();
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Something Amit on Twitch taught me, legend
 // int a[] = {0, 1, 2}; // Declare an array 'a' with elements 0, 1, and 2.
