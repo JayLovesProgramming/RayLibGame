@@ -9,17 +9,25 @@
 
 #include "Utils/Utils.h" // TODO: Implement the above includes to use the header file and implement the CPP file in the CMakeLists.txt when it's ready
 
+Texture2D groundTexture;
+
 void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin, Texture2D groundTexture)
 {
     for (int i = 0; i < envItemsLength; i++)
     {
-        // EnvItem *ei = &envItems[i];
-        // if (ei->blocking)
-        // {
-        //     Rectangle destGroundRec = { ei->rect.x, ei->rect.y, ei->rect.width, ei->rect.height };
-        //     DrawTexture(groundTexture, destGroundRec.x, destGroundRec.y, WHITE);
-        // }
-        DrawRectangleRec(envItems[i].rect, envItems[i].color); // Ground surface rectangle
+        if (USE_CUSTOM_GROUND_TEXTURE)
+        {
+            EnvItem *ei = &envItems[i];
+            if (ei->blocking)
+            {
+                Rectangle destGroundRec = {ei->rect.x, ei->rect.y, ei->rect.width, ei->rect.height};
+                DrawTexture(groundTexture, destGroundRec.x, destGroundRec.y, WHITE);
+            }
+        }
+        else
+        {
+            DrawRectangleRec(envItems[i].rect, envItems[i].color); // Ground surface rectangle
+        }
     }
     destRec.x = player.position.x;
     destRec.y = player.position.y;
@@ -62,7 +70,6 @@ void CheckForCollisionCollide(Player &player, float deltaTime)
     player.canJump = false;                     // Can't jump while falling
 }
 
-
 // Update player loop
 void UpdatePlayer(Player &player, float deltaTime)
 {
@@ -87,6 +94,10 @@ void InitalizeGame()
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
     // SetWindowState(FLAG_WINDOW_UNDECORATED);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
+    if (USE_CUSTOM_GROUND_TEXTURE)
+    {
+        groundTexture = LoadTexture("assets/sprites/Brick_Block.png");
+    }
 }
 
 // Program main entry point
@@ -101,25 +112,23 @@ int main(void)
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
 
-    Texture2D groundTexture = LoadTexture("assets/sprites/Brick_Block.png");
-    
-    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.4)}; // Set the origin to the center of width and bottom of the height
-    sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight}; // Source rectangle (part of the texture to use for drawing)
+    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.0)}; // Set the origin to the center of width and bottom of the height
+    sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight};                          // Source rectangle (part of the texture to use for drawing)
 
     Player player = {0};
-    player.position = Vector2{100, 0};
+    player.position = Vector2{0, 0};
     player.speed = 0;
     player.canJump = false;
     player.sprite = playerTexture;
 
-    Camera2D camera = {0};
+    Camera2D camera = {};
     camera.target = player.position;
     camera.offset = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
     SetTargetFPS(5000);
-    
+
     // TODO: Use origin to calc properly
     Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f}; // Destination rectangle (screen rectangle where drawing part of texture)
     destRec.width = destRec.width / 1.4;
@@ -130,7 +139,7 @@ int main(void)
     {
         float deltaTime = GetFrameTime();
         UpdateGameLoop(player, deltaTime);
-        UpdateCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
+        UpdateGameCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
         musicPlayer.MusicLoop();
         // Drawing
         BeginDrawing();
@@ -146,19 +155,6 @@ int main(void)
     CloseWindow();
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Something Amit on Twitch taught me, legend
 // int a[] = {0, 1, 2}; // Declare an array 'a' with elements 0, 1, and 2.

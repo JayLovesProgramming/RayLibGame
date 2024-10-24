@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-void UpdateCamera(Camera2D &camera, Player &player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
+void UpdateGameCamera(Camera2D &camera, Player &player, EnvItem *envItems, int envItemsLength, float deltaTime, int width, int height)
 {
     camera.target = player.position;
     camera.offset = Vector2{width / 2.0f, height / 2.0f};
