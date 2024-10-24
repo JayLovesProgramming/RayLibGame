@@ -1,18 +1,24 @@
-#include "main.h"
-#include "Screen.h"
+#include "Main.h"
 #include "Debug.h"
 
 #include "Audio/Music/Music.cpp"
-#include "Utils/Utils.cpp"
 #include "Movement/Jump.cpp"
 #include "Movement/Movement.cpp"
 #include "Animations/WalkAndRunAnimations.cpp"
 #include "Camera/Camera.cpp"
 
-void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
+#include "Utils/Utils.h" // TODO: Implement the above includes to use the header file and implement the CPP file in the CMakeLists.txt when it's ready
+
+void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin, Texture2D groundTexture)
 {
     for (int i = 0; i < envItemsLength; i++)
     {
+        // EnvItem *ei = &envItems[i];
+        // if (ei->blocking)
+        // {
+        //     Rectangle destGroundRec = { ei->rect.x, ei->rect.y, ei->rect.width, ei->rect.height };
+        //     DrawTexture(groundTexture, destGroundRec.x, destGroundRec.y, WHITE);
+        // }
         DrawRectangleRec(envItems[i].rect, envItems[i].color); // Ground surface rectangle
     }
     destRec.x = player.position.x;
@@ -94,12 +100,14 @@ int main(void)
     Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
+
+    Texture2D groundTexture = LoadTexture("assets/sprites/Brick_Block.png");
     
-    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.2)}; // Set the origin to the center of width and bottom of the height
+    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.4)}; // Set the origin to the center of width and bottom of the height
     sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight}; // Source rectangle (part of the texture to use for drawing)
 
     Player player = {0};
-    player.position = Vector2{0, 280};
+    player.position = Vector2{100, 0};
     player.speed = 0;
     player.canJump = false;
     player.sprite = playerTexture;
@@ -128,7 +136,7 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
         BeginMode2D(camera);
-        DrawEssentials(destRec, player, origin);
+        DrawEssentials(destRec, player, origin, groundTexture);
         EndMode2D();
         DrawText(TextFormat("FPS: %d", GetFPS()), 40, 40, 40, MAROON);
         EndDrawing();

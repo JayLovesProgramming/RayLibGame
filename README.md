@@ -27,9 +27,10 @@ Step 6: Once you receive a message like "Build finished" in the output, hit F5 a
 
 # Preview
 <div style="display: flex; flex-wrap: wrap; gap: 30px;">
-    <img src="https://i.imgur.com/bJEC3vH.png" alt="Image 1" style="width: 500px; height: auto;">
+    <img src="https://i.imgur.com/27qZnh7.png" alt="Image 1" style="width: 500px; height: auto;">
+    <img src="https://i.imgur.com/bJEC3vH.png" alt="Image 2" style="width: 500px; height: auto;">
     <div>
         <div>Work in progress<div/>
-        <img src="https://i.imgur.com/0eEbQtP.png" alt="Image 2" style="width: 500px; height: auto;">
+        <img src="https://i.imgur.com/0eEbQtP.png" alt="Image 3" style="width: 500px; height: auto;">
     </div>
 </div>

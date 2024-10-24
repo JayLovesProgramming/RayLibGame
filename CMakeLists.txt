@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.0...3.21) # The version of CMake
 
 project(RayLibGame CXX) # Project name and the language (C++)
 
-
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -29,7 +28,7 @@ set(RAYLIB_INCLUDE_DIR "dependencies/raylib/include")
 set(RAYLIB_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/raylib/lib")
 
 include_directories((${RAYLIB_INCLUDE_DIR})) # Include directories
-add_executable(${PROJECT_NAME}  src/main.cpp )
+add_executable(${PROJECT_NAME} src/Main.cpp src/Utils/Utils.cpp )
 target_link_libraries(${PROJECT_NAME} ${RAYLIB_LIB_DIR}/raylib.lib)
 
 if (WIN32)
