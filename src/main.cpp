@@ -3,7 +3,6 @@
 #include "Debug.h"
 #include "Animations/WalkAndRunAnimations.cpp"
 #include "Audio/Music/Music.cpp"
-#include "UI/LoadingScreen/LoadingScreen.cpp"
 
 // Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again
 void CheckForPlayerJump(Player &player)
@@ -165,14 +164,12 @@ int main(void)
     // double time = GetTime();
 
     MusicPlayer musicPlayer = {};
-    LoadingScreen loadingScreen;
-    loadingScreen.InitLoadingScreen("assets/images/background.png", "assets/fonts/FiraMonoNerdFont-Regular.otf");
 
     Player player = {0};
     Camera2D camera = {0};
     Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
     
-    musicPlayer.StartMainGameMusic("assets/music/country.mp3", loadingScreen.loadingComplete);
+    musicPlayer.StartMainGameMusic("assets/music/country.mp3");
 
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
@@ -210,7 +207,6 @@ int main(void)
         float deltaTime = GetFrameTime();
 
         UpdateGameLoop(player, deltaTime);
-        loadingScreen.UpdateLoadingBar();
 
         UpdateCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
 
@@ -224,10 +220,8 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
 
-        loadingScreen.DrawLoadingBar(screenWidth, screenHeight);
-        loadingScreen.HandleInput();
+        musicPlayer.MusicLoop();
 
-        if (!loadingScreen.onMainMenu && loadingScreen.clickedStartGame)
         {
             BeginMode2D(camera);
             DrawEssentials(destRec, player, origin);
