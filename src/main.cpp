@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "Animations/WalkAndRunAnimations.cpp"
 #include "Audio/Music/Music.cpp"
+#include "Utils/Utils.cpp"
 
 // Jumping Logic. Press space bar or the up arrow (if the arrows are activated via the defined variable) to jump - checks that we are on a surface before we can jump again
 void CheckForPlayerJump(Player &player)
@@ -10,15 +11,10 @@ void CheckForPlayerJump(Player &player)
     if ((IsKeyDown(KEY_SPACE) || (IsKeyDown(KEY_UP) && ARE_ARROWS_ACTIVATED) || (IsKeyDown(KEY_W) && SHOULD_W_KEY_JUMP)) && player.canJump)
     {
         float jumpValue = getRandomFloatValue(JUMP_MIN, JUMP_MAX); // Gets a random float value that is randomized between JUMP_MIN and JUMP_MAX
-        player.speed = -jumpValue;                                // Makes the character jump
+        player.speed = -jumpValue;                                 // Makes the character jump
         // player.canJump = false; // ! Seems to not be needed but could be needed in the future when adding super powers etc. canJump gets reset when we touch the ground
     }
 }
-
-const float getRandomFloatValue(int min, int max)
-{
-    return (float)(rand() % (min - max + 1) + min) * PLAYER_JUMP_MULTIPLAYER_JAY;
-};
 
 void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin)
 {
@@ -131,7 +127,6 @@ void UpdateCamera(Camera2D &camera, Player &player, EnvItem *envItems, int envIt
         camera.zoom = 0.54f;
 }
 
-
 // Update player loop
 void UpdatePlayer(Player &player, float deltaTime)
 {
@@ -146,29 +141,29 @@ void UpdateGameLoop(Player &player, float deltaTime)
     UpdatePlayer(player, deltaTime);
 }
 
-// Program main entry point
-int main(void)
+void InitalizeGame()
 {
     // Randomize the seed
     srand(static_cast<unsigned int>(time(nullptr)));
-
     // Initialization
     InitWindow(screenWidth, screenHeight, "JAY");
-
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
-    // SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowState(FLAG_VSYNC_HINT);
+    // SetWindowState(FLAG_WINDOW_RESIZABLE);
     // SetWindowState(FLAG_WINDOW_UNDECORATED);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    // double time = GetTime();
+}
 
-    MusicPlayer musicPlayer = {};
-
+// Program main entry point
+int main(void)
+{
+    InitalizeGame();
     Player player = {0};
     Camera2D camera = {0};
     Texture2D playerTexture = LoadTexture("C:/Users/jayxw/Desktop/RayLibGame/assets/sprites/scarfy.png");
-    
+
+    MusicPlayer musicPlayer = {};
     musicPlayer.StartMainGameMusic("assets/music/country.mp3");
 
     frameWidth = playerTexture.width / 6;
@@ -199,35 +194,20 @@ int main(void)
     destRec.width = destRec.width / 1.4;
     destRec.height = destRec.height / 1.4;
 
-    // player.sprite.width =  player.sprite.width / 1.5;
     // Main game loop
     while (!WindowShouldClose())
     {
-
         float deltaTime = GetFrameTime();
-
         UpdateGameLoop(player, deltaTime);
-
         UpdateCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
-
-        if (IsKeyPressed(KEY_R))
-        {
-            camera.zoom = 1.0f;
-            player.position = Vector2{400, 280};
-        }
-
-        // Draw
+        musicPlayer.MusicLoop();
+        // Drawing
         BeginDrawing();
         ClearBackground(WHITE);
-
-        musicPlayer.MusicLoop();
-
-        {
-            BeginMode2D(camera);
-            DrawEssentials(destRec, player, origin);
-            EndMode2D();
-            DrawText(TextFormat("FPS: %d", GetFPS()), 40, 40, 40, MAROON);
-        }
+        BeginMode2D(camera);
+        DrawEssentials(destRec, player, origin);
+        EndMode2D();
+        DrawText(TextFormat("FPS: %d", GetFPS()), 40, 40, 40, MAROON);
         EndDrawing();
     }
 
@@ -235,7 +215,6 @@ int main(void)
     CloseWindow();
     return 0;
 }
-
 
 // Something Amit on Twitch taught me, legend
 // int a[] = {0, 1, 2}; // Declare an array 'a' with elements 0, 1, and 2.
