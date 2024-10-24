@@ -10,6 +10,8 @@
 #include "Utils/Utils.h" // TODO: Implement the above includes to use the header file and implement the CPP file in the CMakeLists.txt when it's ready
 
 Texture2D groundTexture;
+Texture2D backgroundTexture;
+float backgroundScroll = 0;
 
 void DrawEssentials(Rectangle destRec, Player &player, Vector2 origin, Texture2D groundTexture)
 {
@@ -70,6 +72,33 @@ void CheckForCollisionCollide(Player &player, float deltaTime)
     player.canJump = false;                     // Can't jump while falling
 }
 
+void DrawSkyBackground(float deltaTime)
+{
+    backgroundScroll -= 100 * (deltaTime * 1.1f);
+    // Reset backgroundScroll to loop seamlessly
+    if (backgroundScroll <= -backgroundTexture.width)
+    {
+        backgroundScroll += backgroundTexture.width;
+    }
+    else if (backgroundScroll >= backgroundTexture.width)
+    {
+        backgroundScroll -= backgroundTexture.width;
+    }
+    if (walkAnimation.isRunning)
+    {
+        backgroundScroll -= 1.1f;
+    }
+    else
+    {
+        backgroundScroll += 1.01f;
+    }
+    ClearBackground(PINK);
+    DrawTextureEx(backgroundTexture, Vector2{backgroundScroll, 0}, 0.0f, 1.0f, WHITE);                               // Center instance
+    DrawTextureEx(backgroundTexture, Vector2{backgroundScroll + backgroundTexture.width, 0}, 0.0f, 1.0f, WHITE);     // Right instance
+    DrawTextureEx(backgroundTexture, Vector2{backgroundScroll - backgroundTexture.width, 0}, 0.0f, 1.0f, WHITE);     // Left instance
+    DrawTextureEx(backgroundTexture, Vector2{backgroundScroll + 2 * backgroundTexture.width, 0}, 0.0f, 1.0f, WHITE); // Extra right instance
+}
+
 // Update player loop
 void UpdatePlayer(Player &player, float deltaTime)
 {
@@ -90,10 +119,12 @@ void InitalizeGame()
     InitWindow(screenWidth, screenHeight, "JAY");
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetWindowState(FLAG_VSYNC_HINT);
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
     // SetWindowState(FLAG_WINDOW_UNDECORATED);
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    backgroundTexture = LoadTexture("assets/images/sky.png");
+
     if (USE_CUSTOM_GROUND_TEXTURE)
     {
         groundTexture = LoadTexture("assets/sprites/Brick_Block.png");
@@ -112,8 +143,8 @@ int main(void)
     frameWidth = playerTexture.width / 6;
     frameHeight = playerTexture.height;
 
-    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * 1.0)}; // Set the origin to the center of width and bottom of the height
-    sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight};                          // Source rectangle (part of the texture to use for drawing)
+    Vector2 origin = {static_cast<float>(frameWidth), static_cast<float>(frameHeight * (1.0f + PLAYER_ORIGIN_HEIGHT))}; // Set the origin to the center of width and bottom of the height
+    sourceRec = {0.0f, 0.0f, (float)frameWidth, (float)frameHeight};                                                    // Source rectangle (part of the texture to use for drawing)
 
     Player player = {0};
     player.position = Vector2{0, 0};
@@ -130,20 +161,21 @@ int main(void)
     SetTargetFPS(5000);
 
     // TODO: Use origin to calc properly
-    Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f}; // Destination rectangle (screen rectangle where drawing part of texture)
-    destRec.width = destRec.width / 1.4;
-    destRec.height = destRec.height / 1.4;
+    Rectangle destRec = {screenWidth / 2.0f, screenHeight / 2.0f, frameWidth * 2.0f, frameHeight * 2.0f}; // by doing / 2 and * 2 here we can center the sprite with the circle
+    destRec.width = destRec.width;
+    destRec.height = destRec.height;
 
     // Main game loop
     while (!WindowShouldClose())
     {
         float deltaTime = GetFrameTime();
+
         UpdateGameLoop(player, deltaTime);
         UpdateGameCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
         musicPlayer.MusicLoop();
         // Drawing
         BeginDrawing();
-        ClearBackground(WHITE);
+        DrawSkyBackground(deltaTime);
         BeginMode2D(camera);
         DrawEssentials(destRec, player, origin, groundTexture);
         EndMode2D();
@@ -152,6 +184,9 @@ int main(void)
     }
 
     // De-Initialization
+    UnloadTexture(backgroundTexture);
+    UnloadTexture(playerTexture);
+    UnloadTexture(groundTexture);
     CloseWindow();
     return 0;
 }

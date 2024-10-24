@@ -28,8 +28,11 @@ void UpdateGameCamera(Camera2D &camera, Player &player, EnvItem *envItems, int e
 
     camera.zoom += ((float)GetMouseWheelMove() * 0.05f);
     // Use std::clamp instead here
+    if (!CAMERA_DEBUG)
+    {
     if (camera.zoom >= 1.26f)
         camera.zoom = 1.26f;
     else if (camera.zoom < 0.54f)
         camera.zoom = 0.54f;
+    }
 }
