@@ -59,6 +59,11 @@
         "string": "cpp",
         "vector": "cpp",
         "thread": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "array": "cpp",
+        "algorithm": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "xtree": "cpp"
     }
 }

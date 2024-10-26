@@ -8,6 +8,7 @@
 #include "Camera/Camera.cpp"
 
 #include "Utils/Utils.h" // TODO: Implement the above includes to use the header file and implement the CPP file in the CMakeLists.txt when it's ready
+#include "UI/ImGUI/imgui_manager.h"
 
 Texture2D groundTexture;
 Texture2D backgroundTexture;
@@ -117,6 +118,7 @@ void InitalizeGame()
 {
     srand(static_cast<unsigned int>(time(nullptr))); // Randomize the seed
     InitWindow(screenWidth, screenHeight, "JAY");
+
     SetTraceLogLevel(7);
     SetExitKey(KEY_BACKSPACE);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -129,6 +131,7 @@ void InitalizeGame()
     {
         groundTexture = LoadTexture("assets/sprites/Brick_Block.png");
     }
+    InitImGui();
 }
 
 // Program main entry point
@@ -170,20 +173,24 @@ int main(void)
     {
         float deltaTime = GetFrameTime();
 
+
         UpdateGameLoop(player, deltaTime);
         UpdateGameCamera(camera, player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
         musicPlayer.MusicLoop();
         // Drawing
         BeginDrawing();
+
         DrawSkyBackground(deltaTime);
         BeginMode2D(camera);
         DrawEssentials(destRec, player, origin, groundTexture);
         EndMode2D();
         DrawText(TextFormat("FPS: %d", GetFPS()), 40, 40, 40, MAROON);
+        DrawImGui();
         EndDrawing();
     }
 
     // De-Initialization
+    UnloadImGui();
     UnloadTexture(backgroundTexture);
     UnloadTexture(playerTexture);
     UnloadTexture(groundTexture);

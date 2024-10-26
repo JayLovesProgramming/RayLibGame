@@ -17,7 +17,7 @@ static constexpr bool ARE_ARROWS_ACTIVATED = true;
 static constexpr int PLAYER_GRAVITY = 800; // Lower values = floater
 static constexpr int JUMP_MIN = 30;
 static constexpr int JUMP_MAX = 36;
-static int screenWidth = 1280;
-static int screenHeight = 720;
+static int screenWidth = 1920;
+static int screenHeight = 1080;
 
 void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float deltaTime, Rectangle sourceRec);
